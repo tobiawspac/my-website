@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeOs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="status-bar">
+    <div class="status-left">
+      <button id="os-logo-btn" type="button">FreeOs</button>
+      <span id="date-display">--</span>
+    </div>
+    <div class="status-right">
+      <span id="sb-wifi">📶</span>
+      <span id="sb-battery">🔋</span>
+      <span id="sb-clock">--:--:--</span>
+      <button id="cc-btn" aria-label="Control Center">⚡</button>
+    </div>
+  </div>
+
+  <div id="os-menu" class="hidden">
+    <button class="os-menu-item" data-action="about"><span class="mi-icon">ℹ️</span> About FreeOs</button>
+    <button class="os-menu-item" data-action="settings"><span class="mi-icon">⚙️</span> Settings</button>
+    <div class="os-menu-sep"></div>
+    <button class="os-menu-item" data-action="reset"><span class="mi-icon">🔄</span> Reset to Default</button>
+  </div>
+
+  <div id="sb-wifi-popover" class="sb-popover hidden">
+    <h4>Wi-Fi</h4>
+    <div class="sb-row"><span>Status</span><span id="wifi-status">Connected</span></div>
+    <div class="sb-row"><span>Network</span><span id="wifi-ssid">FreeOs-5G</span></div>
+    <div class="sb-row"><span>Signal</span><span id="wifi-signal">Excellent</span></div>
+  </div>
+
+  <div id="sb-battery-popover" class="sb-popover hidden">
+    <h4>Battery</h4>
+    <div class="sb-row"><span>Level</span><span id="batt-level">--</span></div>
+    <div class="sb-row"><span>Charging</span><span id="batt-charging">--</span></div>
+    <div class="sb-row"><span>Time left</span><span id="batt-time">--</span></div>
+  </div>
+
+  <div id="sb-clock-popover" class="sb-popover hidden">
+    <h4>Volume</h4>
+    <div class="sb-slider">
+      <span>🔊</span>
+      <input type="range" id="sb-volume" min="0" max="100" value="80">
+    </div>
+  </div>
+
+  <div id="context-menu" class="hidden">
+    <button class="ctx-item" data-action="refresh"><span class="ci-icon">🔄</span> Refresh</button>
+    <button class="ctx-item" data-action="arrange"><span class="ci-icon">📐</span> Arrange Icons</button>
+    <button class="ctx-item" data-action="wallpaper"><span class="ci-icon">🖼️</span> Change Wallpaper</button>
+    <div class="ctx-sep"></div>
+    <button class="ctx-item" data-action="about"><span class="ci-icon">ℹ️</span> About FreeOs</button>
+  </div>
+
+  <div id="control-center" class="hidden">
+    <div class="cc-grid">
+      <button class="cc-toggle" id="cc-wifi"><span>📶</span> Wi-Fi</button>
+      <button class="cc-toggle" id="cc-dnd"><span>🔕</span> Do Not Disturb</button>
+      <button class="cc-toggle" id="cc-glass"><span>💎</span> Glass Effect</button>
+      <button class="cc-toggle" id="cc-anim"><span>✨</span> Animations</button>
+    </div>
+    <div class="cc-slider">
+      <span>🔊</span>
+      <input type="range" id="cc-volume" min="0" max="100" value="80">
+    </div>
+  </div>
+
+  <div id="spotlight-overlay" class="hidden">
+    <div id="spotlight-box">
+      <input id="spotlight-input" type="text" placeholder="Search apps..." autocomplete="off">
+      <div id="spotlight-results"></div>
+    </div>
+  </div>
+
+  <div id="desktop">
+    <div id="snap-preview" class="hidden"></div>
+    <div id="selection-box"></div>
+    <div class="desktop-glow"></div>
+
+    <div class="desktop-icons">
+      <div class="icon" data-app="notepad" tabindex="0">
+        <div class="icon-visual">📝</div>
+        <span>Notes</span>
+      </div>
+      <div class="icon" data-app="calculator" tabindex="0">
+        <div class="icon-visual">🧮</div>
+        <span>Calc</span>
+      </div>
+      <div class="icon" data-app="settings" tabindex="0">
+        <div class="icon-visual">⚙️</div>
+        <span>Settings</span>
+      </div>
+      <div class="icon" data-app="console" tabindex="0">
+        <div class="icon-visual">>_</div>
+        <span>Console</span>
+      </div>
+      <div class="icon" data-app="browser" tabindex="0">
+        <div class="icon-visual">🌐</div>
+        <span>Browser</span>
+      </div>
+    </div>
+
+    <button id="buy-plan" class="fab" type="button" aria-label="Upgrade plan">
+      <span>✨</span> Upgrade
+    </button>
+  </div>
+
+  <template id="tpl-window">
+    <div class="window" tabindex="0">
+      <div class="window-titlebar">
+        <span class="window-title">App</span>
+        <div class="window-controls">
+          <button class="win-btn minimize" aria-label="Minimize">─</button>
+          <button class="win-btn maximize" aria-label="Maximize">□</button>
+          <button class="win-btn close" aria-label="Close">×</button>
+        </div>
+      </div>
+      <div class="window-content"></div>
+      <div class="resize-handle resize-se"></div>
+      <div class="resize-handle resize-sw"></div>
+      <div class="resize-handle resize-ne"></div>
+      <div class="resize-handle resize-nw"></div>
+      <div class="resize-handle resize-e"></div>
+      <div class="resize-handle resize-w"></div>
+      <div class="resize-handle resize-s"></div>
+      <div class="resize-handle resize-n"></div>
+    </div>
+  </template>
+
+  <template id="tpl-notepad">
+    <textarea class="notepad-area" placeholder="Type something..."></textarea>
+  </template>
+
+  <template id="tpl-calculator">
+    <div class="calc-grid">
+      <div class="calc-display">0</div>
+      <button class="calc-btn op" data-action="clear">C</button>
+      <button class="calc-btn op" data-action="sign">±</button>
+      <button class="calc-btn op" data-action="percent">%</button>
+      <button class="calc-btn op" data-action="divide">÷</button>
+      <button class="calc-btn">7</button>
+      <button class="calc-btn">8</button>
+      <button class="calc-btn">9</button>
+      <button class="calc-btn op" data-action="multiply">×</button>
+      <button class="calc-btn">4</button>
+      <button class="calc-btn">5</button>
+      <button class="calc-btn">6</button>
+      <button class="calc-btn op" data-action="subtract"></button>
+      <button class="calc-btn">1</button>
+      <button class="calc-btn">2</button>
+      <button class="calc-btn">3</button>
+      <button class="calc-btn op" data-action="add">+</button>
+      <button class="calc-btn zero">0</button>
+      <button class="calc-btn">.</button>
+      <button class="calc-btn op equals" data-action="equals">=</button>
+    </div>
+  </template>
+
+  <template id="tpl-settings">
+    <div class="settings-panel">
+      <h3>Appearance</h3>
+      <label class="setting-row">
+        <span>Accent color</span>
+        <input type="color" id="accent-picker" value="#6366f1">
+      </label>
+      <label class="setting-row">
+        <span>Glass effect</span>
+        <input type="checkbox" id="glass-toggle" checked>
+      </label>
+      <label class="setting-row">
+        <span>Animations</span>
+        <input type="checkbox" id="anim-toggle" checked>
+      </label>
+    </div>
+  </template>
+
+  <template id="tpl-console">
+    <div class="console-app">
+      <div class="console-output"></div>
+      <div class="console-input-row">
+        <span class="console-prompt">&gt;</span>
+        <input class="console-input" type="text" spellcheck="false" autocomplete="off" autofocus>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-browser">
+    <div class="browser-app">
+      <div class="browser-toolbar">
+        <input class="browser-url" type="text" placeholder="Enter URL..." value="https://wikipedia.org" autocomplete="off">
+        <button class="browser-go">Go</button>
+      </div>
+      <iframe class="browser-frame" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" src="https://wikipedia.org"></iframe>
+    </div>
+  </template>
+
+  <template id="tpl-video">
+    <div class="notepad-area" style="display:grid;place-items:center;padding:24px;text-align:center;line-height:1.8;">
+      <div>
+        <div style="font-size:48px;margin-bottom:16px;">📺</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--accent);">fsociety // Mr. Robot</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">S01E01 — eps1.0_hellofriend.mov</div>
+        <div style="font-size:12px;color:var(--text-muted);opacity:0.6;">(no streaming source configured — plug in your own player here)</div>
+      </div>
+    </div>
+  </template>
+
+  <div id="taskbar">
+    <div class="taskbar-start">
+      <button class="start-btn" aria-label="Start">●</button>
+      <div id="open-apps"></div>
+    </div>
+    <div class="taskbar-tray">
+      <div id="clock">--:--:--</div>
+    </div>
+  </div>
+
+  <div id="upsell-toast" class="hidden" role="dialog" aria-modal="true" aria-labelledby="payment-title">
+    <div class="payment-shell">
+      <button class="toast-close" type="button" aria-label="Close payment form">×</button>
+      <div class="payment-brand">● <span>FreeOs</span></div>
+      <div class="payment-layout">
+        <section class="payment-summary">
+          <p class="payment-eyebrow">FreeOs Web Plan</p>
+          <h2 id="payment-title">Upgrade your workspace</h2>
+          <p class="payment-description">Unlock unlimited windows, premium icons, and a smoother desktop experience.</p>
+          <div class="payment-total">
+            <span>Total due today</span>
+            <strong>265 CZK</strong>
+          </div>
+          <ul class="payment-features">
+            <li>Unlimited windows</li>
+            <li>Premium icons and themes</li>
+            <li>Priority support</li>
+          </ul>
+        </section>
+        <section class="payment-form" aria-label="Payment details">
+          <div class="secure-label">🔒 Secure payment</div>
+          <form id="payment-form">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+
+            <label for="card-number">Card information</label>
+            <div class="card-fields">
+              <input id="card-number" name="card-number" type="text" inputmode="numeric" placeholder="1234 1234 1234 1234" autocomplete="cc-number" required>
+              <input name="expiry" type="text" inputmode="numeric" placeholder="MM / YY" autocomplete="cc-exp" required>
+              <input name="cvc" type="text" inputmode="numeric" placeholder="CVC" autocomplete="cc-csc" required>
+            </div>
+
+            <label for="cardholder">Cardholder name</label>
+            <input id="cardholder" name="cardholder" type="text" placeholder="Full name" autocomplete="cc-name" required>
+            <button class="toast-buy" type="submit">Pay 265 CZK</button>
+            <p class="payment-note">This is a payment draft. No payment will be processed.</p>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
